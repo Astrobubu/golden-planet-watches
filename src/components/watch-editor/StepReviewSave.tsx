@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { LiveWatchFace, type WatchHandsConfig, type ExtractedHand } from "@/components/LiveWatchFace";
 import { type Watch, formatPrice, getDisplayPrice } from "@/lib/mock-watches";
+import { DirhamSign } from "@/components/DirhamSign";
 import { saveWatch, clearDraft, saveEditorData } from "@/lib/watch-editor-storage";
 import type { ProcessedHand, HandConfig } from "@/lib/hand-processing";
 import type { GeneratedImage } from "@/lib/gemini";
@@ -200,7 +201,7 @@ export function StepReviewSave({
             <div className="border-t border-gold/10 pt-2 mt-2">
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Price</span>
-                <span className="text-gold font-serif text-lg">{formatPrice(price)}</span>
+                <span className="text-gold font-serif text-lg flex items-center gap-1"><DirhamSign className="w-4 h-4" />{formatPrice(price)}</span>
               </div>
             </div>
           </div>

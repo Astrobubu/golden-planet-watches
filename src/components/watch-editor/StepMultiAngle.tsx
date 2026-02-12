@@ -21,7 +21,7 @@ interface Props {
   watchDetails: Partial<Watch>;
   angleResults: Record<AngleKey, GeneratedImage[]>;
   angleSelections: Record<AngleKey, string | null>;
-  generatingAngle: AngleKey | null;
+  generatingAngles: Set<AngleKey>;
   angleGenerateCounts: Record<AngleKey, number>;
   dispatch: React.Dispatch<WatchEditorAction>;
   onOpenLightbox: (img: GeneratedImage) => void;
@@ -49,7 +49,7 @@ export function StepMultiAngle({
   watchDetails,
   angleResults,
   angleSelections,
-  generatingAngle,
+  generatingAngles,
   angleGenerateCounts,
   dispatch,
   onOpenLightbox,
@@ -58,11 +58,10 @@ export function StepMultiAngle({
   onBack,
 }: Props) {
   const [generatingAll, setGeneratingAll] = useState(false);
-  const [pendingAngles, setPendingAngles] = useState<Set<AngleKey>>(new Set());
 
   const generateAngle = useCallback(
     async (angle: AngleKey) => {
-      dispatch({ type: "SET_GENERATING_ANGLE", angle });
+      dispatch({ type: "ADD_GENERATING_ANGLE", angle });
       try {
         const prompt = getPromptForAngle(angle, analysis, watchDetails);
         const images = await generateImages(source.base64, source.mimeType, prompt, angleGenerateCounts[angle]);
@@ -70,7 +69,7 @@ export function StepMultiAngle({
       } catch {
         // silent fail per angle
       } finally {
-        dispatch({ type: "SET_GENERATING_ANGLE", angle: null });
+        dispatch({ type: "REMOVE_GENERATING_ANGLE", angle });
       }
     },
     [source, analysis, watchDetails, angleGenerateCounts, dispatch]
@@ -78,19 +77,10 @@ export function StepMultiAngle({
 
   const generateAll = useCallback(async () => {
     setGeneratingAll(true);
-    // Mark all angles as pending so they all show skeletons
-    const allKeys = new Set(ANGLES.map((a) => a.key));
-    setPendingAngles(allKeys);
-    for (const { key } of ANGLES) {
-      // Remove from pending (it transitions to generating via generatingAngle)
-      setPendingAngles((prev) => {
-        const next = new Set(prev);
-        next.delete(key);
-        return next;
-      });
-      await generateAngle(key);
-    }
-    setPendingAngles(new Set());
+    // Fire all 4 angles in parallel
+    await Promise.allSettled(
+      ANGLES.map(({ key }) => generateAngle(key))
+    );
     setGeneratingAll(false);
   }, [generateAngle]);
 
@@ -114,7 +104,7 @@ export function StepMultiAngle({
 
         <button
           onClick={generateAll}
-          disabled={!!generatingAngle || generatingAll}
+          disabled={generatingAngles.size > 0 || generatingAll}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gold/15 border border-gold/30 text-sm text-gold hover:bg-gold/25 transition-colors disabled:opacity-50"
         >
           {generatingAll ? (
@@ -135,7 +125,7 @@ export function StepMultiAngle({
           icon={icon}
           images={angleResults[key]}
           selected={angleSelections[key]}
-          generating={generatingAngle === key || pendingAngles.has(key)}
+          generating={generatingAngles.has(key)}
           generateCount={angleGenerateCounts[key]}
           onCountChange={(n) => dispatch({ type: "SET_ANGLE_GENERATE_COUNT", angle: key, count: n })}
           onGenerate={() => generateAngle(key)}

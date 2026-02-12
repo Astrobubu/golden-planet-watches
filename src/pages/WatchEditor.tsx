@@ -216,7 +216,7 @@ export default function WatchEditor() {
             watchDetails={state.watchDetails}
             angleResults={state.angleResults}
             angleSelections={state.angleSelections}
-            generatingAngle={state.generatingAngle}
+            generatingAngles={state.generatingAngles}
             angleGenerateCounts={state.angleGenerateCounts}
             dispatch={dispatch}
             onOpenLightbox={handleOpenLightbox}

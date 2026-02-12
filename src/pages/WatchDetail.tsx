@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
@@ -27,6 +27,15 @@ const WatchDetail = () => {
   const watch = watches.find((w) => w.id === id);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [showLive, setShowLive] = useState(!!watch?.live_face_data);
+  const [zoomed, setZoomed] = useState(false);
+  const [zoomOrigin, setZoomOrigin] = useState({ x: 50, y: 50 });
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setZoomOrigin({ x, y });
+  }, []);
 
   // Gallery images = only AI-generated shots (NOT the source upload)
   const galleryImages = useMemo(() => {
@@ -112,7 +121,12 @@ const WatchDetail = () => {
               className="space-y-4"
             >
               {/* Main Image */}
-              <div className={`aspect-square rounded-sm border border-border overflow-hidden flex items-center justify-center ${showLive && hasLive ? "bg-white" : "bg-surface-elevated"}`}>
+              <div
+                className={`aspect-square rounded-sm border border-border overflow-hidden flex items-center justify-center cursor-crosshair ${showLive && hasLive ? "bg-white" : "bg-surface-elevated"}`}
+                onMouseEnter={() => setZoomed(true)}
+                onMouseLeave={() => setZoomed(false)}
+                onMouseMove={handleMouseMove}
+              >
                 {showLive && hasLive ? (
                   <LiveWatchToggle
                     staticSrc={galleryImages[0] || ""}
@@ -124,7 +138,11 @@ const WatchDetail = () => {
                   <img
                     src={galleryImages[selectedImageIndex]}
                     alt={`${watch.brand} ${watch.model}`}
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain transition-transform duration-300 ease-out"
+                    style={{
+                      transform: zoomed ? "scale(2)" : "scale(1)",
+                      transformOrigin: `${zoomOrigin.x}% ${zoomOrigin.y}%`,
+                    }}
                   />
                 ) : (
                   <div className="text-center">

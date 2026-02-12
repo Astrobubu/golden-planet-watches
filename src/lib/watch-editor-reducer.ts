@@ -37,7 +37,7 @@ function defaultState(): WatchEditorState {
 
     angleResults: emptyAngleResults(),
     angleSelections: emptyAngleSelections(),
-    generatingAngle: null,
+    generatingAngles: new Set<import("@/lib/watch-editor-types").AngleKey>(),
 
     handSheetResults: [],
     handSheetSelection: null,
@@ -133,8 +133,17 @@ export function watchEditorReducer(
         angleSelections: { ...state.angleSelections, [action.angle]: action.imageId },
       };
 
-    case "SET_GENERATING_ANGLE":
-      return { ...state, generatingAngle: action.angle };
+    case "ADD_GENERATING_ANGLE": {
+      const next = new Set(state.generatingAngles);
+      next.add(action.angle);
+      return { ...state, generatingAngles: next };
+    }
+
+    case "REMOVE_GENERATING_ANGLE": {
+      const next = new Set(state.generatingAngles);
+      next.delete(action.angle);
+      return { ...state, generatingAngles: next };
+    }
 
     case "SET_HAND_SHEET_RESULTS":
       return { ...state, handSheetResults: action.images, handSheetSelection: null };

@@ -50,7 +50,7 @@ export interface WatchEditorState {
   // Step 2 — Multi-Angle Shots
   angleResults: Record<AngleKey, GeneratedImage[]>;
   angleSelections: Record<AngleKey, string | null>;
-  generatingAngle: AngleKey | null;
+  generatingAngles: Set<AngleKey>;
 
   // Step 3 — Clock Hands Extraction
   handSheetResults: GeneratedImage[];
@@ -91,7 +91,8 @@ export type WatchEditorAction =
   | { type: "UPDATE_DETAILS"; details: Partial<Watch> }
   | { type: "SET_ANGLE_RESULTS"; angle: AngleKey; images: GeneratedImage[] }
   | { type: "SELECT_ANGLE"; angle: AngleKey; imageId: string | null }
-  | { type: "SET_GENERATING_ANGLE"; angle: AngleKey | null }
+  | { type: "ADD_GENERATING_ANGLE"; angle: AngleKey }
+  | { type: "REMOVE_GENERATING_ANGLE"; angle: AngleKey }
   | { type: "SET_HAND_SHEET_RESULTS"; images: GeneratedImage[] }
   | { type: "SELECT_HAND_SHEET"; imageId: string | null }
   | { type: "SET_GENERATING_HAND_SHEET"; generating: boolean }

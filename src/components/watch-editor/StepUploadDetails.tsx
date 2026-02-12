@@ -6,6 +6,7 @@ import { CONDITIONS, type ConditionRating } from "@/lib/conditions";
 import { analyzeWatch, type WatchAnalysis } from "@/lib/gemini";
 import type { Watch } from "@/lib/mock-watches";
 import type { SourceImage, WatchEditorAction } from "@/lib/watch-editor-types";
+import { DirhamSign } from "@/components/DirhamSign";
 import { useState } from "react";
 
 interface Props {
@@ -242,7 +243,7 @@ export function StepUploadDetails({
             <Field label="Dial Color" value={watchDetails.dial_color ?? ""} onChange={(v) => updateField("dial_color", v)} />
             <Field label="Case Material" value={watchDetails.case_material ?? ""} onChange={(v) => updateField("case_material", v)} />
             <Field label="Case Size (mm)" type="number" value={watchDetails.case_size_mm ?? ""} onChange={(v) => updateField("case_size_mm", Number(v))} />
-            <Field label="Base Price ($)" type="number" value={watchDetails.base_price ?? ""} onChange={(v) => updateField("base_price", Number(v))} />
+            <Field label={<>Base Price <DirhamSign className="w-3 h-3" /></>} type="number" value={watchDetails.base_price ?? ""} onChange={(v) => updateField("base_price", Number(v))} />
             <Field label="Margin %" type="number" value={watchDetails.margin_percent ?? 10} onChange={(v) => updateField("margin_percent", Number(v))} />
             <SelectField
               label="Condition"
@@ -295,14 +296,14 @@ function Field({
   onChange,
   type = "text",
 }: {
-  label: string;
+  label: React.ReactNode;
   value: string | number;
   onChange: (v: string) => void;
   type?: string;
 }) {
   return (
     <div>
-      <label className="text-[10px] tracking-[0.15em] uppercase text-muted-foreground block mb-1">
+      <label className="text-[10px] tracking-[0.15em] uppercase text-muted-foreground mb-1 flex items-center gap-1">
         {label}
       </label>
       <input

@@ -3,9 +3,24 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
 const TIERS = [
-  { visit: 1, discount: 3, message: "Before you go — enjoy 3% off this piece" },
-  { visit: 2, discount: 5, message: "Welcome back — here's 5% off, just for you" },
-  { visit: 3, discount: 8, message: "Final offer — 8% off, don't miss it" },
+  {
+    visit: 1,
+    heading: "Join Our Private Circle",
+    message: "Gain early access to rare and newly authenticated timepieces before they reach the public collection.",
+    cta: "Request Access",
+  },
+  {
+    visit: 2,
+    heading: "Welcome Back, Collector",
+    message: "Let one of our specialists curate a personal selection based on your taste and collection goals.",
+    cta: "Speak with a Specialist",
+  },
+  {
+    visit: 3,
+    heading: "An Exclusive Preview Awaits",
+    message: "As a returning visitor, you have priority access to our latest acquisitions — pieces not yet listed in the collection.",
+    cta: "View Preview",
+  },
 ];
 
 export function ExitIntentPopup() {
@@ -13,13 +28,13 @@ export function ExitIntentPopup() {
   const [tier, setTier] = useState(TIERS[0]);
 
   useEffect(() => {
-    const visits = parseInt(localStorage.getItem("mdt_visits") || "0", 10) + 1;
-    localStorage.setItem("mdt_visits", String(visits));
+    const visits = parseInt(localStorage.getItem("gpw_visits") || "0", 10) + 1;
+    localStorage.setItem("gpw_visits", String(visits));
 
     const tierIndex = Math.min(visits - 1, TIERS.length - 1);
     setTier(TIERS[tierIndex]);
 
-    const dismissed = sessionStorage.getItem("mdt_exit_dismissed");
+    const dismissed = sessionStorage.getItem("gpw_exit_dismissed");
     if (dismissed) return;
 
     const handler = (e: MouseEvent) => {
@@ -34,7 +49,7 @@ export function ExitIntentPopup() {
 
   const dismiss = useCallback(() => {
     setShow(false);
-    sessionStorage.setItem("mdt_exit_dismissed", "true");
+    sessionStorage.setItem("gpw_exit_dismissed", "true");
   }, []);
 
   return (
@@ -60,10 +75,10 @@ export function ExitIntentPopup() {
             </button>
 
             <p className="font-sans text-[10px] tracking-[0.4em] uppercase text-gold/60 mb-3">
-              Exclusive Offer
+              Private Invitation
             </p>
             <h3 className="font-serif text-2xl text-gold-gradient mb-4">
-              {tier.discount}% Off
+              {tier.heading}
             </h3>
             <p className="font-sans text-sm text-muted-foreground mb-6">
               {tier.message}
@@ -72,7 +87,7 @@ export function ExitIntentPopup() {
               onClick={dismiss}
               className="font-sans text-xs font-medium tracking-[0.25em] uppercase text-gold border border-gold/30 px-8 py-3 transition-all duration-300 hover:bg-gold/10"
             >
-              Claim Offer
+              {tier.cta}
             </button>
           </motion.div>
         </motion.div>

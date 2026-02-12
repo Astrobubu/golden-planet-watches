@@ -1,13 +1,15 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { WatchCard } from "./WatchCard";
 import { useAllWatches } from "@/hooks/use-watches";
-import { Link } from "react-router-dom";
 
-export function FeaturedSection() {
+export function NewlyAddedSection() {
   const { watches } = useAllWatches();
-  const featured = watches.filter((w) => w.is_featured);
+  const newest = [...watches]
+    .sort((a, b) => b.year - a.year || b.id.localeCompare(a.id))
+    .slice(0, 3);
 
-  if (featured.length === 0) return null;
+  if (newest.length === 0) return null;
 
   return (
     <section className="py-24 bg-background">
@@ -20,15 +22,15 @@ export function FeaturedSection() {
           className="text-center mb-16"
         >
           <p className="font-sans text-[10px] font-medium tracking-[0.4em] uppercase text-gold/60 mb-3">
-            Hand-Selected
+            Fresh Arrivals
           </p>
           <h2 className="font-serif text-3xl md:text-4xl text-gold-gradient">
-            Featured Pieces
+            Newly Added
           </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {featured.map((watch, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {newest.map((watch, i) => (
             <WatchCard key={watch.id} watch={watch} index={i} />
           ))}
         </div>
@@ -44,7 +46,7 @@ export function FeaturedSection() {
             to="/catalog"
             className="font-sans text-xs font-medium tracking-[0.3em] uppercase text-gold/70 transition-colors hover:text-gold"
           >
-            View Entire Collection →
+            See All →
           </Link>
         </motion.div>
       </div>

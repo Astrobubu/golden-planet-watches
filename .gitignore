@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# MCP config
+mcp.json
+
+# Windows artifacts
+nul
